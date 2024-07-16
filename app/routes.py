@@ -3,6 +3,7 @@ from app import app, mysql, bcrypt
 from app.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, ChangePasswordForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
+import hashlib
 
 @app.route("/")
 @app.route("/home")
@@ -27,7 +28,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.get_by_email(form.email.data)
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and User.verify_password(user.password, form.password.data):
             login_user(user, remember=True)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
@@ -61,7 +62,7 @@ def reset_token(token):
         return redirect(url_for('reset_request'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        hashed_password = hashlib.md5(form.password.data.encode()).hexdigest()
         user.password = hashed_password
         mysql.connection.commit()
         flash('Your password has been updated! You are now able to log in', 'success')
@@ -73,8 +74,8 @@ def reset_token(token):
 def account():
     form = ChangePasswordForm()
     if form.validate_on_submit():
-        if bcrypt.check_password_hash(current_user.password, form.old_password.data):
-            hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        if User.verify_password(current_user.password, form.old_password.data):
+            hashed_password = hashlib.md5(form.new_password.data.encode()).hexdigest()
             current_user.password = hashed_password
             mysql.connection.commit()
             flash('Your password has been changed!', 'success')

@@ -15,6 +15,7 @@ class RegistrationForm(FlaskForm):
         if user:
             raise ValidationError('Email already registered. Please choose a different one.')
 
+
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])

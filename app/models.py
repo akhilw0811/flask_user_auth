@@ -1,3 +1,4 @@
+import hashlib
 from flask_login import UserMixin
 from app import mysql, login_manager, bcrypt
 
@@ -30,11 +31,15 @@ class User(UserMixin):
 
     @staticmethod
     def create(username, email, password):
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        hashed_password = hashlib.md5(password.encode()).hexdigest()
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
         mysql.connection.commit()
         cur.close()
+
+    def verify_password(stored_password, provided_password):
+        return stored_password == hashlib.md5(provided_password.encode()).hexdigest()
+
 
 @login_manager.user_loader
 def load_user(user_id):
