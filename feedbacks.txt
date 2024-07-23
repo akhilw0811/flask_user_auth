@@ -1,0 +1,7 @@
+Register Form:
+    1) Instead of showing validation error messages in alert box, show them under text field either in <span> or <p> tag.
+    2) client side validation failing for the username field. If i input only spaces it is not validating properly.
+    3) There is not validation on login form. Email field accepting any text, It should accept email only.
+    4) Server side validation: Validation messages are not appearing properly. Messages are sticking to input fields.
+    5) If email is incorrect, validation message is coming, also, if I input the exising email id, both message are coming up, Email already exist and invalid email address. 
+    6) Why password is not counting the spaces. It can be possible a user can have password of spaces only.
