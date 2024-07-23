@@ -8,28 +8,28 @@
             {{ form.hidden_tag() }}
             <div class="form-group">
                 {{ form.username.label(class="form-control-label") }}
-                {{ form.username(class="form-control form-control-lg") }}
+                {{ form.username(class="form-control form-control-lg", id="username") }}
                 {% for error in form.username.errors %}
                     <div class="alert alert-danger">{{ error }}</div>
                 {% endfor %}
             </div>
             <div class="form-group">
                 {{ form.email.label(class="form-control-label") }}
-                {{ form.email(class="form-control form-control-lg") }}
+                {{ form.email(class="form-control form-control-lg", id="email") }}
                 {% for error in form.email.errors %}
                     <div class="alert alert-danger">{{ error }}</div>
                 {% endfor %}
             </div>
             <div class="form-group">
                 {{ form.password.label(class="form-control-label") }}
-                {{ form.password(class="form-control form-control-lg") }}
+                {{ form.password(class="form-control form-control-lg", id="password") }}
                 {% for error in form.password.errors %}
                     <div class="alert alert-danger">{{ error }}</div>
                 {% endfor %}
             </div>
             <div class="form-group">
                 {{ form.confirm_password.label(class="form-control-label") }}
-                {{ form.confirm_password(class="form-control form-control-lg") }}
+                {{ form.confirm_password(class="form-control form-control-lg", id="confirm_password") }}
             </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
@@ -41,14 +41,23 @@
 <script>
     document.getElementById('registerForm').addEventListener('submit', function(event) {
         var email = document.getElementById('email').value;
+        var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
         var confirmPassword = document.getElementById('confirm_password').value;
 
         var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         var isValid = true;
 
+        if (username.length < 3 || username.length > 20) {
+            alert('Username must be between 3 and 20 characters.');
+            isValid = false;
+        }
+
         if (!emailPattern.test(email)) {
             alert('Invalid email address.');
+            isValid = false;
+        } else if (email.length > 254) {
+            alert('Email must be less than 254 characters.');
             isValid = false;
         }
 
@@ -62,7 +71,9 @@
             isValid = false;
         }
 
-        if (!isValid) {
+        if (isValid) {
+            document.getElementById('username').value = username;
+        } else {
             event.preventDefault();
         }
     });

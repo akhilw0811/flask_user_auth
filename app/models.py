@@ -31,6 +31,7 @@ class User(UserMixin):
 
     @staticmethod
     def create(username, email, password):
+        username = username.strip()
         hashed_password = hashlib.md5(password.encode()).hexdigest()
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
