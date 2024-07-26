@@ -4,10 +4,14 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from app.models import User
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=254)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    username = StringField('Username', validators=[DataRequired(message="Username is required."), Length(min=3, max=20,
+                                              message="Username must be between 3 and 20 characters.")])
+    email = StringField('Email', validators=[DataRequired(message="Email is required."), Email(message="Invalid email address."), Length(max=254,
+                                           message="Email must be less than 254 characters.")])
+    password = PasswordField('Password', validators=[DataRequired(message="Password is required."), Length(min=6,
+                                                message="Password must be at least 6 characters.")])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(message="Password confirmation is required."),EqualTo('password',
+                                                         message="Passwords must match.")])
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
@@ -16,9 +20,10 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Email already registered. Please choose a different one.')
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=254)])
+    email = StringField('Email', validators=[DataRequired(), Email(message="Invalid email address."), Length(max=254)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
 
 class RequestResetForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=254)])
