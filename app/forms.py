@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.models import User
 
@@ -44,3 +44,13 @@ class ChangePasswordForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
     confirm_new_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Change Password')
+
+class AddUserForm(FlaskForm):
+    username = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone = StringField('Phone', validators=[DataRequired(), Length(min=10, max=15)])
+    user_type = SelectField('Usertype', choices=[('admin', 'Admin'), ('user', 'User')], validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Add User')
+

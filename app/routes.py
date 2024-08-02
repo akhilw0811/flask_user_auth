@@ -1,9 +1,10 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, jsonify, abort
 from app import app, mysql, bcrypt
-from app.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, ChangePasswordForm
+from app.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, ChangePasswordForm, AddUserForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 import hashlib
+from app.decorators import superadmin_required
 
 @app.route("/")
 @app.route("/home")
@@ -82,3 +83,57 @@ def account():
         else:
             flash('Old password is incorrect', 'danger')
     return render_template('account.html', title='Account', form=form)
+
+@app.route("/add_user", methods=['GET', 'POST'])
+@superadmin_required
+def add_user():
+    form = AddUserForm()
+    if form.validate_on_submit():
+        hashed_password = hashlib.md5(form.password.data.encode()).hexdigest()
+        User.create(
+            username=form.username.data.strip(),
+            email=form.email.data.strip(),
+            password=hashed_password,
+            user_type=form.user_type.data
+        )
+        flash('User has been created!', 'success')
+        return redirect(url_for('list_users'))
+    return render_template('add_user.html', title='Add User', form=form)
+
+@app.route("/list_users")
+@superadmin_required
+def list_users():
+    return render_template('list_users.html')
+
+@app.route("/api/users")
+@superadmin_required
+def api_users():
+    users = User.query.filter_by(is_delete='N').all()
+    user_data = [{
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'phone': user.phone,
+        'user_type': user.user_type,
+        'is_enable': user.is_enable
+    } for user in users]
+    return jsonify(user_data)
+
+@app.route("/toggle_user/<int:user_id>", methods=['POST'])
+@superadmin_required
+def toggle_user(user_id):
+    user = User.query.get(user_id)
+    if user.is_enable == 'Y':
+        user.is_enable = 'N'
+    else:
+        user.is_enable = 'Y'
+    mysql.session.commit()
+    return jsonify(success=True)
+
+@app.route("/delete_user/<int:user_id>", methods=['POST'])
+@superadmin_required
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    user.is_delete = 'Y'
+    mysql.session.commit()
+    return jsonify(success=True)

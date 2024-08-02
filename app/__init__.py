@@ -3,6 +3,8 @@ from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from config import Config
+from app.decorators import superadmin_required
+
 
 app = Flask(__name__)
 app.config.from_object(Config)

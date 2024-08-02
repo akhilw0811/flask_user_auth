@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}List Users{% endblock %}
+{% block content %}
+<table id="usersTable" class="display">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Usertype</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+</table>
+
+<script>
+$(document).ready(function() {
+    $('#usersTable').DataTable({
+        "ajax": "/api/users",
+        "columns": [
+            { "data": "username" },
+            { "data": "email" },
+            { "data": "phone" },
+            { "data": "user_type" },
+            { "data": "is_enable", "render": function(data, type, row) {
+                return data == 'Y' ? 'Enabled' : 'Disabled';
+            }},
+            { "data": null, "render": function(data, type, row) {
+                return '<button class="edit-btn" data-id="' + row.id + '">Edit</button>' +
+                       '<button class="enable-btn" data-id="' + row.id + '">Enable</button>' +
+                       '<button class="disable-btn" data-id="' + row.id + '">Disable</button>' +
+                       '<button class="delete-btn" data-id="' + row.id + '">Delete</button>';
+            }}
+        ]
+    });
+
+    $('#usersTable').on('click', '.enable-btn', function() {
+        var userId = $(this).data('id');
+        $.post('/toggle_user/' + userId, function(response) {
+            if (response.success) {
+                $('#usersTable').DataTable().ajax.reload();
+            }
+        });
+    });
+
+    $('#usersTable').on('click', '.disable-btn', function() {
+        var userId = $(this).data('id');
+        $.post('/toggle_user/' + userId, function(response) {
+            if (response.success) {
+                $('#usersTable').DataTable().ajax.reload();
+            }
+        });
+    });
+
+    $('#usersTable').on('click', '.delete-btn', function() {
+        var userId = $(this).data('id');
+        $.post('/delete_user/' + userId, function(response) {
+            if (response.success) {
+                $('#usersTable').DataTable().ajax.reload();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
