@@ -73,8 +73,11 @@
             isValid = false;
         }
 
-        if (password.length < 6) {
-            document.getElementById('passwordError').innerText = 'Password must be at least 6 characters.';
+        if (!password) {
+            document.getElementById('passwordError').innerText = 'Password is required.';
+            isValid = false;
+        } else if (password.length < 6 || password.length > 20) {
+            document.getElementById('passwordError').innerText = 'Password must be between 6 and 20 characters.';
             isValid = false;
         }
 
@@ -87,6 +90,7 @@
             event.preventDefault();
         } else {
             document.getElementById('username').value = username;
+            document.getElementById('email').value = email;
         }
     });
 </script>
