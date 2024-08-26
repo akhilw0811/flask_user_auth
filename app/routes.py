@@ -69,21 +69,6 @@ def reset_token(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html', title='Reset Password', form=form)
 
-@app.route("/account", methods=['GET', 'POST'])
-@login_required
-def account():
-    form = ChangePasswordForm()
-    if form.validate_on_submit():
-        if User.verify_password(current_user.password, form.old_password.data):
-            hashed_password = hashlib.md5(form.new_password.data.encode()).hexdigest()
-            current_user.password = hashed_password
-            mysql.connection.commit()
-            flash('Your password has been changed!', 'success')
-            return redirect(url_for('account'))
-        else:
-            flash('Old password is incorrect', 'danger')
-    return render_template('account.html', title='Account', form=form)
-
 @app.route("/add_user", methods=['GET', 'POST'])
 @superadmin_required
 def add_user():
